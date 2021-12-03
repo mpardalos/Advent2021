@@ -6,14 +6,14 @@ use std::{
 fn day1(buf: &mut dyn BufRead) {
     let errmsg = "Could not read number";
     let mut increases = 0;
-    let mut lines = buf.lines();
+    let mut lines = buf.lines().map(|l| l.unwrap());
 
-    let first_line = lines.next().expect(errmsg).expect(errmsg);
+    let first_line = lines.next().unwrap();
 
-    let mut last: i32 = first_line.parse().expect(errmsg);
+    let mut last: i32 = first_line.parse().unwrap();
 
     for line in lines {
-        let this: i32 = line.expect(errmsg).parse().expect(errmsg);
+        let this: i32 = line.parse().unwrap();
         if this > last {
             increases += 1;
         }
