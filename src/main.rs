@@ -1,10 +1,9 @@
 use std::{
-    fs,
+    fs::{self, File},
     io::{BufRead, BufReader},
 };
 
-fn day1(buf: &mut dyn BufRead) {
-    let errmsg = "Could not read number";
+fn day1_p1(buf: &mut BufReader<File>) {
     let mut increases = 0;
     let mut lines = buf.lines().map(|l| l.unwrap());
 
@@ -20,11 +19,43 @@ fn day1(buf: &mut dyn BufRead) {
         last = this;
     }
 
-    println!("The value increases {} times", increases);
+    println!("Day 1: The value increases {} times", increases);
+}
+
+fn day1_p2(buf: &mut BufReader<File>) {
+    let mut increases = 0;
+    let lines: Vec<i32> = buf.lines().map(|l| l.unwrap().parse().unwrap()).collect();
+
+    let mut last_sum = lines[0] + lines[1] + lines[2];
+
+    let mut start_idx = 1;
+    let mut end_idx = 4;
+
+    while end_idx <= lines.len() {
+        let this_sum: i32 = (&lines[start_idx..end_idx]).iter().sum();
+        if this_sum > last_sum {
+            increases += 1;
+        }
+        start_idx += 1;
+        end_idx += 1;
+        last_sum = this_sum;
+    }
+
+    println!(
+        "Day 1: The sliding window value increases {} times",
+        increases
+    );
+}
+
+fn solution<F>(day: i32, solver: F)
+where
+    F: Fn(&mut BufReader<File>),
+{
+    let file = fs::File::open(format!("inputs/{}", day)).expect("Could not read file");
+    solver(&mut BufReader::new(file));
 }
 
 fn main() {
-    let file = fs::File::open("inputs/1").expect("Could not read file");
-
-    day1(&mut BufReader::new(file));
+    solution(1, day1_p1);
+    solution(1, day1_p2);
 }
