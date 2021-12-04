@@ -116,6 +116,51 @@ fn day2_p2(buf: &mut BufReader<File>) {
         horizontal * depth
     );
 }
+
+// Day 3 ----------------------------------------------------------------------------------
+fn transpose<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
+    assert!(!v.is_empty());
+    let len = v[0].len();
+    let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+    (0..len)
+        .map(|_| {
+            iters
+                .iter_mut()
+                .map(|n| n.next().unwrap())
+                .collect::<Vec<T>>()
+        })
+        .collect()
+}
+
+fn day3_p1(buf: &mut BufReader<File>) {
+    let lines: Vec<Vec<char>> = buf.lines().map(|l| l.unwrap().chars().collect()).collect();
+
+    let most_common : Vec<char> = transpose(lines).iter().map(|column| {
+        let ones = column.iter().fold(0, |acc, c| match c {
+            '0' => acc,
+            '1' => acc + 1,
+            _ => {
+                panic!("Unexpected character: {}", c)
+            }
+        });
+        if ones > column.len() / 2 {
+            '1'
+        } else {
+            '0'
+        }
+    }).collect();
+
+    let gamma_str : String = most_common.clone().into_iter().collect();
+    let epsilon_str : String = most_common.into_iter().map(|c| match c {
+        '1' => {'0'}
+        '0' => {'1'}
+        _ => {panic!("Unexpected character: {}", c)}
+    }).collect();
+
+    let gamma = isize::from_str_radix(&gamma_str, 2).unwrap();
+    let epsilon = isize::from_str_radix(&epsilon_str, 2).unwrap();
+
+    println!("Day 3 - part 1: Gamma={}, Epsilon={}, Power Consumption={}", gamma, epsilon, gamma*epsilon);
 }
 
 // Utility --------------------------------------------------------------------------------
@@ -133,4 +178,5 @@ fn main() {
     solution(1, day1_p2);
     solution(2, day2_p1);
     solution(2, day2_p2);
+    solution(3, day3_p1);
 }
