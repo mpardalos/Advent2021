@@ -1,6 +1,7 @@
 use std::{
     fs::{self, File},
-    io::{BufRead, BufReader}, time::Instant,
+    io::{BufRead, BufReader},
+    time::Instant,
 };
 
 // Day 1 ----------------------------------------------------------------------------------
@@ -184,7 +185,7 @@ fn day3_p1(buf: &mut BufReader<File>) -> String {
     )
 }
 
-// Utility --------------------------------------------------------------------------------
+// Runner  --------------------------------------------------------------------------------
 
 fn solution<F>(day: i32, part: i8, solver: F)
 where
@@ -197,8 +198,19 @@ where
     let after = Instant::now();
 
     let duration = after - before;
+    let duration_display = if duration.as_millis() > 0 {
+        format!("{}ms", duration.as_millis())
+    } else {
+        format!("{}us", duration.as_micros())
+    };
 
-    println!("[{}ms] Day {} - Part {}: {}", duration.as_millis(), day, part, answer);
+    println!(
+        "[{}] Day {} - Part {}: {}",
+        duration_display,
+        day,
+        part,
+        answer
+    );
 }
 
 fn main() {
