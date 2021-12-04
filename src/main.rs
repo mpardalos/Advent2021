@@ -1,11 +1,11 @@
 use std::{
     fs::{self, File},
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader}, time::Instant,
 };
 
 // Day 1 ----------------------------------------------------------------------------------
 
-fn day1_p1(buf: &mut BufReader<File>) {
+fn day1_p1(buf: &mut BufReader<File>) -> String {
     let mut increases = 0;
     let mut lines = buf.lines().map(|l| l.unwrap());
 
@@ -21,10 +21,10 @@ fn day1_p1(buf: &mut BufReader<File>) {
         last = this;
     }
 
-    println!("Day 1: The value increases {} times", increases);
+    format!("The value increases {} times", increases)
 }
 
-fn day1_p2(buf: &mut BufReader<File>) {
+fn day1_p2(buf: &mut BufReader<File>) -> String {
     let mut increases = 0;
     let lines: Vec<i32> = buf.lines().map(|l| l.unwrap().parse().unwrap()).collect();
 
@@ -43,15 +43,15 @@ fn day1_p2(buf: &mut BufReader<File>) {
         last_sum = this_sum;
     }
 
-    println!(
-        "Day 1: The sliding window value increases {} times",
+    format!(
+        "The sliding window value increases {} times",
         increases
-    );
+    )
 }
 
 // Day 2 ----------------------------------------------------------------------------------
 
-fn day2_p1(buf: &mut BufReader<File>) {
+fn day2_p1(buf: &mut BufReader<File>) -> String {
     let mut depth = 0;
     let mut horizontal = 0;
 
@@ -75,15 +75,15 @@ fn day2_p1(buf: &mut BufReader<File>) {
         }
     }
 
-    println!(
-        "Day 2 - Part 1: Horizontal={}, Depth={}, Product={}",
+    format!(
+        "Horizontal={}, Depth={}, Product={}",
         horizontal,
         depth,
         horizontal * depth
-    );
+    )
 }
 
-fn day2_p2(buf: &mut BufReader<File>) {
+fn day2_p2(buf: &mut BufReader<File>) -> String {
     let mut depth = 0;
     let mut horizontal = 0;
     let mut aim = 0;
@@ -109,12 +109,12 @@ fn day2_p2(buf: &mut BufReader<File>) {
         }
     }
 
-    println!(
-        "Day 2 - Part 2: Horizontal={}, Depth={}, Product={}",
+    format!(
+        "Horizontal={}, Depth={}, Product={}",
         horizontal,
         depth,
         horizontal * depth
-    );
+    )
 }
 
 // Day 3 ----------------------------------------------------------------------------------
@@ -132,51 +132,79 @@ fn transpose<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
         .collect()
 }
 
-fn day3_p1(buf: &mut BufReader<File>) {
+fn find_most_common(column: &Vec<char>) -> char {
+    let ones = column.iter().fold(0, |acc, c| match c {
+        '0' => acc,
+        '1' => acc + 1,
+        _ => {
+            panic!("Unexpected character: {}", c)
+        }
+    });
+    if ones > column.len() / 2 {
+        '1'
+    } else if ones < column.len() / 2 {
+        '0'
+    } else {
+        'x'
+    }
+}
+
+fn day3_p1(buf: &mut BufReader<File>) -> String {
     let lines: Vec<Vec<char>> = buf.lines().map(|l| l.unwrap().chars().collect()).collect();
 
-    let most_common : Vec<char> = transpose(lines).iter().map(|column| {
-        let ones = column.iter().fold(0, |acc, c| match c {
-            '0' => acc,
-            '1' => acc + 1,
+    let most_common: Vec<char> = transpose(lines)
+        .iter()
+        .map(find_most_common)
+        .map(|c| match c {
+            'x' => '1',
+            _ => c,
+        })
+        .collect();
+
+    let gamma_str: String = most_common.clone().into_iter().collect();
+    let epsilon_str: String = most_common
+        .into_iter()
+        .map(|c| match c {
+            '1' => '0',
+            '0' => '1',
             _ => {
                 panic!("Unexpected character: {}", c)
             }
-        });
-        if ones > column.len() / 2 {
-            '1'
-        } else {
-            '0'
-        }
-    }).collect();
-
-    let gamma_str : String = most_common.clone().into_iter().collect();
-    let epsilon_str : String = most_common.into_iter().map(|c| match c {
-        '1' => {'0'}
-        '0' => {'1'}
-        _ => {panic!("Unexpected character: {}", c)}
-    }).collect();
+        })
+        .collect();
 
     let gamma = isize::from_str_radix(&gamma_str, 2).unwrap();
     let epsilon = isize::from_str_radix(&epsilon_str, 2).unwrap();
 
-    println!("Day 3 - part 1: Gamma={}, Epsilon={}, Power Consumption={}", gamma, epsilon, gamma*epsilon);
+    format!(
+        "Gamma={}, Epsilon={}, Power Consumption={}",
+        gamma,
+        epsilon,
+        gamma * epsilon
+    )
 }
 
 // Utility --------------------------------------------------------------------------------
 
-fn solution<F>(day: i32, solver: F)
+fn solution<F>(day: i32, part: i8, solver: F)
 where
-    F: Fn(&mut BufReader<File>),
+    F: Fn(&mut BufReader<File>) -> String,
 {
     let file = fs::File::open(format!("inputs/{}", day)).expect("Could not read file");
-    solver(&mut BufReader::new(file));
+
+    let before = Instant::now();
+    let answer = solver(&mut BufReader::new(file));
+    let after = Instant::now();
+
+    let duration = after - before;
+
+    println!("[{}ms] Day {} - Part {}: {}", duration.as_millis(), day, part, answer);
 }
 
 fn main() {
-    solution(1, day1_p1);
-    solution(1, day1_p2);
-    solution(2, day2_p1);
-    solution(2, day2_p2);
-    solution(3, day3_p1);
+    solution(1, 1, day1_p1);
+    solution(1, 2, day1_p2);
+    solution(2, 1, day2_p1);
+    solution(2, 2, day2_p2);
+    solution(3, 1, day3_p1);
 }
