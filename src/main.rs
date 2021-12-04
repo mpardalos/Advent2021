@@ -3,6 +3,8 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+// Day 1 ---------------------------------------------------------------------------------- 
+
 fn day1_p1(buf: &mut BufReader<File>) {
     let mut increases = 0;
     let mut lines = buf.lines().map(|l| l.unwrap());
@@ -46,6 +48,8 @@ fn day1_p2(buf: &mut BufReader<File>) {
         increases
     );
 }
+
+// Utility -------------------------------------------------------------------------------- 
 
 fn solution<F>(day: i32, solver: F)
 where
