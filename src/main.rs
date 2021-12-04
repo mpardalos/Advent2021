@@ -3,7 +3,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-// Day 1 ---------------------------------------------------------------------------------- 
+// Day 1 ----------------------------------------------------------------------------------
 
 fn day1_p1(buf: &mut BufReader<File>) {
     let mut increases = 0;
@@ -49,7 +49,76 @@ fn day1_p2(buf: &mut BufReader<File>) {
     );
 }
 
-// Utility -------------------------------------------------------------------------------- 
+// Day 2 ----------------------------------------------------------------------------------
+
+fn day2_p1(buf: &mut BufReader<File>) {
+    let mut depth = 0;
+    let mut horizontal = 0;
+
+    for line in buf.lines().map(|l| l.unwrap()) {
+        if let [command, count_str] = line.split(' ').collect::<Vec<&str>>()[..] {
+            let count: i32 = count_str.parse().unwrap();
+            match command {
+                "forward" => {
+                    horizontal += count;
+                }
+                "down" => {
+                    depth += count;
+                }
+                "up" => {
+                    depth -= count;
+                }
+                _ => {
+                    panic!("Invalid command {}", command);
+                }
+            }
+        }
+    }
+
+    println!(
+        "Day 2 - Part 1: Horizontal={}, Depth={}, Product={}",
+        horizontal,
+        depth,
+        horizontal * depth
+    );
+}
+
+fn day2_p2(buf: &mut BufReader<File>) {
+    let mut depth = 0;
+    let mut horizontal = 0;
+    let mut aim = 0;
+
+    for line in buf.lines().map(|l| l.unwrap()) {
+        if let [command, count_str] = line.split(' ').collect::<Vec<&str>>()[..] {
+            let count: i32 = count_str.parse().unwrap();
+            match command {
+                "forward" => {
+                    horizontal += count;
+                    depth += count * aim;
+                }
+                "down" => {
+                    aim += count;
+                }
+                "up" => {
+                    aim -= count;
+                }
+                _ => {
+                    panic!("Invalid command {}", command);
+                }
+            }
+        }
+    }
+
+    println!(
+        "Day 2 - Part 2: Horizontal={}, Depth={}, Product={}",
+        horizontal,
+        depth,
+        horizontal * depth
+    );
+}
+}
+
+// Utility --------------------------------------------------------------------------------
 
 fn solution<F>(day: i32, solver: F)
 where
@@ -62,4 +131,6 @@ where
 fn main() {
     solution(1, day1_p1);
     solution(1, day1_p2);
+    solution(2, day2_p1);
+    solution(2, day2_p2);
 }
