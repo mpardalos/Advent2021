@@ -44,10 +44,7 @@ fn day1_p2(buf: &mut BufReader<File>) -> String {
         last_sum = this_sum;
     }
 
-    format!(
-        "The sliding window value increases {} times",
-        increases
-    )
+    format!("The sliding window value increases {} times", increases)
 }
 
 // Day 2 ----------------------------------------------------------------------------------
