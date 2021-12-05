@@ -140,26 +140,17 @@ fn find_most_common(column: &Vec<char>) -> char {
             panic!("Unexpected character: {}", c)
         }
     });
-    if ones > column.len() / 2 {
+    if ones as f32 >= column.len() as f32 / 2.0 {
         '1'
-    } else if ones < column.len() / 2 {
-        '0'
     } else {
-        'x'
+        '0'
     }
 }
 
 fn day3_p1(buf: &mut BufReader<File>) -> String {
     let lines: Vec<Vec<char>> = buf.lines().map(|l| l.unwrap().chars().collect()).collect();
 
-    let most_common: Vec<char> = transpose(lines)
-        .iter()
-        .map(find_most_common)
-        .map(|c| match c {
-            'x' => '1',
-            _ => c,
-        })
-        .collect();
+    let most_common: Vec<char> = transpose(lines).iter().map(find_most_common).collect();
 
     let gamma_str: String = most_common.clone().into_iter().collect();
     let epsilon_str: String = most_common
@@ -181,6 +172,63 @@ fn day3_p1(buf: &mut BufReader<File>) -> String {
         gamma,
         epsilon,
         gamma * epsilon
+    )
+}
+
+fn vec_as_string(v: &Vec<char>) -> String {
+    v.into_iter().collect::<String>()
+}
+
+fn day3_p2(buf: &mut BufReader<File>) -> String {
+    let lines: Vec<Vec<char>> = buf.lines().map(|l| l.unwrap().chars().collect()).collect();
+
+    let mut oxygen_lines = lines.clone();
+
+    for bit_idx in 0..oxygen_lines[0].len() {
+        let columns = transpose(oxygen_lines.clone());
+        let most_common_vec: Vec<char> = columns.iter().map(find_most_common).collect();
+        let most_common = most_common_vec[bit_idx];
+
+        oxygen_lines.retain(|l| l[bit_idx] == most_common);
+        if oxygen_lines.len() <= 1 {
+            break;
+        }
+    }
+
+    let mut co2_lines = lines.clone();
+
+    for bit_idx in 0..co2_lines[0].len() {
+        let most_common_vec: Vec<char> = transpose(co2_lines.clone())
+            .iter()
+            .map(find_most_common)
+            .collect();
+        let most_common = most_common_vec[bit_idx];
+
+        co2_lines.retain(|l| l[bit_idx] != most_common);
+        if co2_lines.len() <= 1 {
+            break;
+        }
+    }
+
+    let oxygen_rating: isize = if oxygen_lines.len() == 1 {
+        let bitstr: String = (oxygen_lines[0].clone()).into_iter().collect();
+        isize::from_str_radix(&bitstr, 2).unwrap()
+    } else {
+        return "Could not determine oxygen rating".to_string();
+    };
+
+    let co2_rating: isize = if co2_lines.len() == 1 {
+        let bitstr: String = (co2_lines[0].clone()).into_iter().collect();
+        isize::from_str_radix(&bitstr, 2).unwrap()
+    } else {
+        return "Could not determine co2 rating".to_string();
+    };
+
+    format!(
+        "Oxygen rating: {} | CO2 rating: {} | Life support rating: {}",
+        oxygen_rating,
+        co2_rating,
+        oxygen_rating * co2_rating
     )
 }
 
@@ -235,4 +283,5 @@ fn main() {
     solution(2, 1, day2_p1);
     solution(2, 2, day2_p2);
     solution(3, 1, day3_p1);
+    solution(3, 2, day3_p2);
 }
