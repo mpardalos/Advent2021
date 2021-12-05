@@ -12,7 +12,7 @@ mod day1 {
         io::{BufRead, BufReader},
     };
 
-    pub fn day1_p1(buf: &mut BufReader<File>) -> String {
+    pub fn part1(buf: &mut BufReader<File>) -> String {
         let mut increases = 0;
         let mut lines = buf.lines().map(|l| l.unwrap());
 
@@ -31,7 +31,7 @@ mod day1 {
         format!("The value increases {} times", increases)
     }
 
-    pub fn day1_p2(buf: &mut BufReader<File>) -> String {
+    pub fn part2(buf: &mut BufReader<File>) -> String {
         let mut increases = 0;
         let lines: Vec<i32> = buf.lines().map(|l| l.unwrap().parse().unwrap()).collect();
 
@@ -60,7 +60,7 @@ mod day2 {
         io::{BufRead, BufReader},
     };
 
-    pub fn day2_p1(buf: &mut BufReader<File>) -> String {
+    pub fn part1(buf: &mut BufReader<File>) -> String {
         let mut depth = 0;
         let mut horizontal = 0;
 
@@ -92,7 +92,7 @@ mod day2 {
         )
     }
 
-    pub fn day2_p2(buf: &mut BufReader<File>) -> String {
+    pub fn part2(buf: &mut BufReader<File>) -> String {
         let mut depth = 0;
         let mut horizontal = 0;
         let mut aim = 0;
@@ -162,7 +162,7 @@ mod day3 {
         }
     }
 
-    pub fn day3_p1(buf: &mut BufReader<File>) -> String {
+    pub fn part1(buf: &mut BufReader<File>) -> String {
         let lines: Vec<Vec<char>> = buf.lines().map(|l| l.unwrap().chars().collect()).collect();
 
         let most_common: Vec<char> = transpose(lines).iter().map(find_most_common).collect();
@@ -194,7 +194,7 @@ mod day3 {
         v.into_iter().collect::<String>()
     }
 
-    pub fn day3_p2(buf: &mut BufReader<File>) -> String {
+    pub fn part2(buf: &mut BufReader<File>) -> String {
         let lines: Vec<Vec<char>> = buf.lines().map(|l| l.unwrap().chars().collect()).collect();
 
         let mut oxygen_lines = lines.clone();
@@ -341,7 +341,7 @@ mod day4 {
         return (sequence, boards);
     }
 
-    pub fn day4_p1(buf: &mut BufReader<File>) -> String {
+    pub fn part1(buf: &mut BufReader<File>) -> String {
         let (sequence, mut boards) = day4_read_input(buf);
 
         for draw in sequence {
@@ -377,7 +377,7 @@ mod day4 {
         return format!("No bingo");
     }
 
-    pub fn day4_p2(buf: &mut BufReader<File>) -> String {
+    pub fn part2(buf: &mut BufReader<File>) -> String {
         let (sequence, mut boards) = day4_read_input(buf);
 
         for draw in sequence {
@@ -507,7 +507,7 @@ mod day5 {
             .collect()
     }
 
-    pub fn day5_p1<const N: usize>(buf: &mut BufReader<File>) -> String {
+    pub fn part1<const N: usize>(buf: &mut BufReader<File>) -> String {
         let mut board: Box<Board<N>> = Box::new([[0; N]; N]);
         for line in read_input(buf) {
             if line.is_vertical() {
@@ -533,7 +533,7 @@ mod day5 {
         )
     }
 
-    pub fn day5_p2<const N: usize>(buf: &mut BufReader<File>) -> String {
+    pub fn part1<const N: usize>(buf: &mut BufReader<File>) -> String {
         let mut board: Box<Board<N>> = Box::new([[0; N]; N]);
         for line in read_input(buf) {
             if line.is_vertical() {
@@ -623,18 +623,18 @@ where
 }
 
 fn main() {
-    solution(1, 1, day1::day1_p1);
-    solution(1, 2, day1::day1_p2);
+    solution(1, 1, day1::part1);
+    solution(1, 2, day1::part2);
 
-    solution(2, 1, day2::day2_p1);
-    solution(2, 2, day2::day2_p2);
+    solution(2, 1, day2::part1);
+    solution(2, 2, day2::part2);
 
-    solution(3, 1, day3::day3_p1);
-    solution(3, 2, day3::day3_p2);
+    solution(3, 1, day3::part1);
+    solution(3, 2, day3::part2);
 
-    solution(4, 1, day4::day4_p1);
-    solution(4, 2, day4::day4_p2);
+    solution(4, 1, day4::part1);
+    solution(4, 2, day4::part2);
 
-    solution(5, 1, day5::day5_p1::<1024>);
-    solution(5, 2, day5::day5_p2::<1024>);
+    solution(5, 1, day5::part1::<1024>);
+    solution(5, 2, day5::part1::<1024>);
 }
