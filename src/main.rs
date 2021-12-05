@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 
+use core::fmt;
 use std::{
+    fmt::Display,
     fs::{self, File},
     io::{BufRead, BufReader},
     time::Instant,
@@ -232,6 +234,133 @@ fn day3_p2(buf: &mut BufReader<File>) -> String {
     )
 }
 
+// Day 4 ----------------------------------------------------------------------------------
+
+fn print_boards(boards: &Vec<[[(bool, i32); 5]; 5]>) {
+    for board in boards {
+        for line in board {
+            for (status, num) in line {
+                if *status {
+                    eprint!("[{:>2}] ", num);
+                } else {
+                    eprint!("{:>4} ", num);
+                }
+            }
+            eprintln!();
+        }
+        eprintln!();
+    }
+}
+
+#[derive(Debug)]
+enum Bingo {
+    Row(usize),
+    Column(usize),
+}
+
+impl Display for Bingo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Bingo::Row(row) => {
+                write!(f, "Row {}", row)
+            }
+            Bingo::Column(column) => {
+                write!(f, "Row {}", column)
+            }
+        }
+    }
+}
+
+fn check_bingo<const N: usize>(board: &[[(bool, i32); N]; N]) -> Option<Bingo> {
+    // Rows
+    for (row_idx, row) in board.iter().enumerate() {
+        if row.iter().all(|(status, _)| *status) {
+            return Some(Bingo::Row(row_idx.try_into().unwrap()));
+        }
+    }
+
+    // Columns
+    for col_idx in 0..N {
+        if board.iter().all(|r| r[col_idx].0) {
+            return Some(Bingo::Column(col_idx.try_into().unwrap()));
+        }
+    }
+
+    return None;
+}
+
+fn day4_read_input(buf: &mut BufReader<File>) -> (Vec<i32>, Vec<[[(bool, i32); 5]; 5]>) {
+    let mut lines = buf.lines().map(|l| l.unwrap());
+
+    let first_line = lines.next().unwrap();
+    let sequence: Vec<i32> = first_line
+        .split(",")
+        .map(|s| s.parse::<i32>().unwrap())
+        .collect();
+
+    let mut boards: Vec<[[(bool, i32); 5]; 5]> = Vec::new();
+
+    let mut board_line = 0;
+    for line in lines {
+        if line.is_empty() {
+            board_line = 0;
+            boards.push([[(false, 0); 5]; 5]);
+            continue;
+        }
+
+        for (idx, num) in line
+            .split_whitespace()
+            .map(|n| n.parse::<i32>().unwrap())
+            .enumerate()
+        {
+            boards.last_mut().unwrap()[board_line][idx] = (false, num);
+        }
+        board_line += 1;
+    }
+
+    return (sequence, boards);
+}
+
+fn day4_p1(buf: &mut BufReader<File>) -> String {
+    let (sequence, mut boards) = day4_read_input(buf);
+
+    for draw in sequence {
+        for board in boards.iter_mut() {
+            for line in board.iter_mut() {
+                for (status, num) in line.iter_mut() {
+                    if *num == draw {
+                        *status = true;
+                    }
+                }
+            }
+        }
+
+        // eprintln!("------------------------");
+        // print_boards(&boards);
+
+        for (board_num, board) in boards.iter().enumerate() {
+            if let Some(location) = check_bingo(board) {
+                let score_sum: i32 = board
+                    .iter()
+                    .flatten()
+                    .filter(|(status, _)| !*status)
+                    .map(|(_, val)| val)
+                    .sum();
+                return format!(
+                    "Bingo! Board {} ({}) - Score = {} * {} = {}",
+                    board_num,
+                    location,
+                    draw,
+                    score_sum,
+                    draw * score_sum
+                );
+            }
+        }
+    }
+
+    return format!("No bingo");
+}
+
 // Runner  --------------------------------------------------------------------------------
 
 fn solution_with_file_format<F>(day: i32, part: i8, solver: F, filepath: &String) -> String
@@ -284,4 +413,5 @@ fn main() {
     solution(2, 2, day2_p2);
     solution(3, 1, day3_p1);
     solution(3, 2, day3_p2);
+    solution(4, 1, day4_p1);
 }
