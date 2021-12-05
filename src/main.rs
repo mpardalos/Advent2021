@@ -353,13 +353,9 @@ mod day4 {
         let (sequence, mut boards) = day4_read_input(buf);
 
         for draw in sequence {
-            for board in boards.iter_mut() {
-                for line in board.iter_mut() {
-                    for (status, num) in line.iter_mut() {
-                        if *num == draw {
-                            *status = true;
-                        }
-                    }
+            for (status, num) in boards.iter_mut().flatten().flatten() {
+                if *num == draw {
+                    *status = true;
                 }
             }
 
