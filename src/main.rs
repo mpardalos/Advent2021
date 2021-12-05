@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::{
     fs::{self, File},
     io::{BufRead, BufReader},
@@ -184,11 +186,11 @@ fn day3_p1(buf: &mut BufReader<File>) -> String {
 
 // Runner  --------------------------------------------------------------------------------
 
-fn solution<F>(day: i32, part: i8, solver: F)
+fn solution_with_file_format<F>(day: i32, part: i8, solver: F, filepath: &String) -> String
 where
     F: Fn(&mut BufReader<File>) -> String,
 {
-    let file = fs::File::open(format!("inputs/{}", day)).expect("Could not read file");
+    let file = fs::File::open(filepath).expect("Could not read file");
 
     let before = Instant::now();
     let answer = solver(&mut BufReader::new(file));
@@ -201,12 +203,29 @@ where
         format!("{}us", duration.as_micros())
     };
 
-    println!(
+    format!(
         "[{}] Day {} - Part {}: {}",
-        duration_display,
-        day,
-        part,
-        answer
+        duration_display, day, part, answer
+    )
+}
+
+fn solution<F>(day: i32, part: i8, solver: F)
+where
+    F: Fn(&mut BufReader<File>) -> String,
+{
+    println!(
+        "{}",
+        solution_with_file_format(day, part, solver, &format!("inputs/{}", day))
+    );
+}
+
+fn solution_with_sample<F>(day: i32, part: i8, solver: F)
+where
+    F: Fn(&mut BufReader<File>) -> String,
+{
+    println!(
+        "[SAMPLE] {}",
+        solution_with_file_format(day, part, solver, &format!("inputs/{}_sample", day))
     );
 }
 
