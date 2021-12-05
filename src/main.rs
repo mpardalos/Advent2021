@@ -384,6 +384,41 @@ mod day4 {
 
         return format!("No bingo");
     }
+
+    pub fn day4_p2(buf: &mut BufReader<File>) -> String {
+        let (sequence, mut boards) = day4_read_input(buf);
+
+        for draw in sequence {
+            for (status, num) in boards.iter_mut().flatten().flatten() {
+                if *num == draw {
+                    *status = true;
+                }
+            }
+
+            // eprintln!("------------------------");
+            // print_boards(&boards);
+
+            if boards.len() > 1 {
+                // Drop won boards
+                boards.retain(|board| check_bingo(board).is_none());
+            } else if let Some(_) = check_bingo(&boards[0]) {
+                let score_sum: i32 = boards[0]
+                    .iter()
+                    .flatten()
+                    .filter(|(status, _)| !*status)
+                    .map(|(_, val)| val)
+                    .sum();
+                return format!(
+                    "Last bingo has score = {} * {} = {}",
+                    draw,
+                    score_sum,
+                    draw * score_sum
+                );
+            }
+        }
+
+        return format!("No bingo");
+    }
 }
 
 // Runner  --------------------------------------------------------------------------------
@@ -442,4 +477,5 @@ fn main() {
     solution(3, 2, day3::day3_p2);
 
     solution(4, 1, day4::day4_p1);
+    solution(4, 2, day4::day4_p2);
 }
