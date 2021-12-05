@@ -246,13 +246,13 @@ where
 
     let duration = after - before;
     let duration_display = if duration.as_millis() > 0 {
-        format!("{}ms", duration.as_millis())
+        format!("{:>3}ms", duration.as_millis())
     } else {
-        format!("{}us", duration.as_micros())
+        format!("{:>3}us", duration.as_micros())
     };
 
     format!(
-        "[{}] Day {} - Part {}: {}",
+        "[{}][Day {:>2}][Part {:>2}]: {}",
         duration_display, day, part, answer
     )
 }
