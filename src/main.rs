@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use clap::Parser;
 use std::{
     fs::{self, File},
     io::BufReader,
@@ -17,6 +18,13 @@ trait Solution {
     const PART: u8;
 
     fn solve(buf: &mut BufReader<File>) -> String;
+}
+
+trait Extra {
+    const DAY: u8;
+    const USE_SAMPLE: bool;
+
+    fn run(buf: &mut BufReader<File>);
 }
 
 fn format_solution_with_file<S: Solution>(filepath: &String) -> String {
@@ -56,19 +64,47 @@ fn solution_with_sample<S: Solution>() {
     )
 }
 
+fn extra<E: Extra>() {
+    let filepath = if E::USE_SAMPLE {
+        format!("inputs/{}_sample", E::DAY)
+    } else {
+        format!("inputs/{}", E::DAY)
+    };
+
+    let file = fs::File::open(filepath).expect("Could not read file");
+
+    E::run(&mut BufReader::new(file));
+}
+
+#[derive(Parser)]
+struct Opts {
+    #[clap(short, long, about = "Run an 'extra', e.g. a visualisation")]
+    extra: Option<String>,
+}
+
 fn main() {
-    solution::<day1::Part1>();
-    solution::<day1::Part2>();
+    let opts = Opts::parse();
 
-    solution::<day2::Part1>();
-    solution::<day2::Part2>();
+    match opts.extra {
+        None => {
+            solution::<day1::Part1>();
+            solution::<day1::Part2>();
 
-    solution::<day3::Part1>();
-    solution::<day3::Part2>();
+            solution::<day2::Part1>();
+            solution::<day2::Part2>();
 
-    solution::<day4::Part1>();
-    solution::<day4::Part2>();
+            solution::<day3::Part1>();
+            solution::<day3::Part2>();
 
-    solution::<day5::Part1<1024>>();
-    solution::<day5::Part1<1024>>();
+            solution::<day4::Part1>();
+            solution::<day4::Part2>();
+
+            solution::<day5::Part1<1024>>();
+            solution::<day5::Part1<1024>>();
+        }
+        Some(e) => match e.as_str() {
+            "vis4" => extra::<day4::Visualise>(),
+            _ => eprintln!("Extra does not exist: {}", e),
+        },
+    }
 }

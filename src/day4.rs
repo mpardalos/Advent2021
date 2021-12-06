@@ -1,3 +1,4 @@
+use ansi_term::{Colour, Style};
 use core::fmt;
 use std::{
     fmt::Display,
@@ -5,23 +6,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-use crate::Solution;
-
-fn print_boards(boards: &Vec<[[(bool, i32); 5]; 5]>) {
-    for board in boards {
-        for line in board {
-            for (status, num) in line {
-                if *status {
-                    eprint!("[{:>2}] ", num);
-                } else {
-                    eprint!("{:>4} ", num);
-                }
-            }
-            eprintln!();
-        }
-        eprintln!();
-    }
-}
+use crate::{Extra, Solution};
 
 #[derive(Debug)]
 enum Bingo {
@@ -172,5 +157,49 @@ impl Solution for Part2 {
         }
 
         return format!("No bingo");
+    }
+}
+
+pub struct Visualise;
+impl Extra for Visualise {
+    const DAY: u8 = 4;
+    const USE_SAMPLE: bool = true;
+
+    fn run(buf: &mut BufReader<File>) {
+        let normal: Style = Style::new().dimmed();
+        let marked: Style = Style::new().fg(Colour::Cyan);
+        let just_marked: Style = Style::new().underline().bold().fg(Colour::Red);
+
+        let (sequence, mut boards) = read_input(buf);
+        let mut input = String::new();
+
+        for draw in sequence {
+            for (status, num) in boards.iter_mut().flatten().flatten() {
+                if *num == draw {
+                    *status = true;
+                }
+            }
+
+            // Clear the screen
+            print!("\x1B[2J\n");
+            for board in &boards {
+                for line in board {
+                    for (status, num) in line {
+                        let text = format!("{:>2}", num);
+                        let style = if *status && *num == draw {
+                            just_marked
+                        } else if *status {
+                            marked
+                        } else {
+                            normal
+                        };
+                        print!("{} ", style.paint(text));
+                    }
+                    println!();
+                }
+                println!();
+            }
+            std::io::stdin().read_line(&mut input).unwrap();
+        }
     }
 }
