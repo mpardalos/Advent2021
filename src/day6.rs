@@ -15,7 +15,7 @@ fn read_input(buf: &mut io::BufReader<fs::File>) -> Vec<u8> {
 
 fn special_lanternfish(initial: Vec<u8>, days: u16) -> String {
     let mut lanternfish = initial;
-    for day in 0..days {
+    for _day in 0..days {
         let mut newfish = 0;
         for timer in lanternfish.iter_mut() {
             match timer {
