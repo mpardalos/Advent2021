@@ -12,6 +12,7 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 trait Solution {
     const DAY: u8;
@@ -101,6 +102,8 @@ fn main() {
 
             solution::<day5::Part1<1024>>();
             solution::<day5::Part1<1024>>();
+
+            solution::<day6::Part2>();
         }
         Some(e) => match e.as_str() {
             "vis4" => extra::<day4::Visualise>(),
