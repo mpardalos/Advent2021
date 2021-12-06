@@ -37,9 +37,9 @@ fn format_solution_with_file<S: Solution>(filepath: &String) -> String {
 
     let duration = after - before;
     let duration_display = if duration.as_millis() > 0 {
-        format!("{:>3}ms", duration.as_millis())
+        format!("{:>2}.   ms", duration.as_millis())
     } else {
-        format!("{:>3}us", duration.as_micros())
+        format!("  .{:0>3}ms", duration.as_micros())
     };
 
     format!(
