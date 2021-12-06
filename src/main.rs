@@ -103,6 +103,7 @@ fn main() {
             solution::<day5::Part1<1024>>();
             solution::<day5::Part1<1024>>();
 
+            solution::<day6::Part1>();
             solution::<day6::Part2>();
         }
         Some(e) => match e.as_str() {
