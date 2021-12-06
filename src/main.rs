@@ -4,7 +4,7 @@ use clap::Parser;
 use std::{
     fs::{self, File},
     io::BufReader,
-    time::Instant,
+    time::{Instant, Duration},
 };
 
 mod day1;
@@ -28,7 +28,11 @@ trait Extra {
     fn run(buf: &mut BufReader<File>);
 }
 
-fn format_solution_with_file<S: Solution>(filepath: &String) -> String {
+fn format_duration(duration: Duration) -> String {
+    format!("{:.3}ms", duration.as_secs_f64() * 1000f64)
+}
+
+fn solution_with_file<S: Solution>(filepath: &String) -> Duration {
     let file = fs::File::open(filepath).expect("Could not read file");
 
     let before = Instant::now();
@@ -36,33 +40,24 @@ fn format_solution_with_file<S: Solution>(filepath: &String) -> String {
     let after = Instant::now();
 
     let duration = after - before;
-    let duration_display = if duration.as_millis() > 0 {
-        format!("{:>2}.   ms", duration.as_millis())
-    } else {
-        format!("  .{:0>3}ms", duration.as_micros())
-    };
 
-    format!(
+    println!(
         "[{}][Day {:>2}][Part {:>2}]: {}",
-        duration_display,
+        format_duration(duration),
         S::DAY,
         S::PART,
         answer
-    )
+    );
+
+    duration
 }
 
-fn solution<S: Solution>() {
-    println!(
-        "{}",
-        format_solution_with_file::<S>(&format!("inputs/{}", S::DAY))
-    )
+fn solution<S: Solution>() -> Duration {
+    solution_with_file::<S>(&format!("inputs/{}", S::DAY))
 }
 
-fn solution_with_sample<S: Solution>() {
-    println!(
-        "[SAMPLE] {}",
-        format_solution_with_file::<S>(&format!("inputs/{}_sample", S::DAY))
-    )
+fn solution_with_sample<S: Solution>() -> Duration {
+    solution_with_file::<S>(&format!("inputs/{}_sample", S::DAY))
 }
 
 fn extra<E: Extra>() {
@@ -88,23 +83,27 @@ fn main() {
 
     match opts.extra {
         None => {
-            solution::<day1::Part1>();
-            solution::<day1::Part2>();
+            let mut clock: Duration = Duration::new(0,0);
 
-            solution::<day2::Part1>();
-            solution::<day2::Part2>();
+            clock += solution::<day1::Part1>();
+            clock += solution::<day1::Part2>();
 
-            solution::<day3::Part1>();
-            solution::<day3::Part2>();
+            clock += solution::<day2::Part1>();
+            clock += solution::<day2::Part2>();
 
-            solution::<day4::Part1>();
-            solution::<day4::Part2>();
+            clock += solution::<day3::Part1>();
+            clock += solution::<day3::Part2>();
 
-            solution::<day5::Part1<1024>>();
-            solution::<day5::Part1<1024>>();
+            clock += solution::<day4::Part1>();
+            clock += solution::<day4::Part2>();
 
-            solution::<day6::Part1>();
-            solution::<day6::Part2>();
+            clock += solution::<day5::Part1<1024>>();
+            clock += solution::<day5::Part2<1024>>();
+
+            clock += solution::<day6::Part1>();
+            clock += solution::<day6::Part2>();
+
+            println!("[{}]", format_duration(clock));
         }
         Some(e) => match e.as_str() {
             "vis4" => extra::<day4::Visualise>(),
