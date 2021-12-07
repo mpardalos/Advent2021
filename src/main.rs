@@ -13,6 +13,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
 
 trait Solution {
     const DAY: u8;
@@ -102,6 +103,9 @@ fn main() {
 
             clock += solution::<day6::Part1>();
             clock += solution::<day6::Part2>();
+
+            clock += solution::<day7::Part1>();
+            clock += solution::<day7::Part2>();
 
             println!("[{}]", format_duration(clock));
         }
