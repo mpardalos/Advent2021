@@ -29,7 +29,7 @@ trait Extra {
 }
 
 fn format_duration(duration: Duration) -> String {
-    format!("{:.3}ms", duration.as_secs_f64() * 1000f64)
+    format!("{:>8.3}ms", duration.as_secs_f64() * 1000f64)
 }
 
 fn solution_with_file<S: Solution>(filepath: &String) -> Duration {
