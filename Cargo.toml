@@ -3,8 +3,10 @@ name = "aoc21"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-ansi_term = "0.12.1"
 clap = "3.0.0-beta.5"
+ansi_term = "0.12.1"
+# For visualisations
+raqote = "0.7.10"
+font-kit = "0.5.0"
+minifb = "0.15.3"

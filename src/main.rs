@@ -14,6 +14,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod visualisation;
 
 trait Solution {
     const DAY: u8;
@@ -111,6 +112,7 @@ fn main() {
         }
         Some(e) => match e.as_str() {
             "vis4" => extra::<day4::Visualise>(),
+            "vis7" => extra::<day7::Visualise>(),
             _ => eprintln!("Extra does not exist: {}", e),
         },
     }
