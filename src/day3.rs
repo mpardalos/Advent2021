@@ -1,7 +1,4 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use std::io::BufRead;
 
 use crate::Solution;
 
@@ -39,7 +36,7 @@ impl Solution for Part1 {
     const DAY: u8 = 3;
     const PART: u8 = 1;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let lines: Vec<Vec<char>> = buf.lines().map(|l| l.unwrap().chars().collect()).collect();
 
         let most_common: Vec<char> = transpose(lines).iter().map(find_most_common).collect();
@@ -77,7 +74,7 @@ impl Solution for Part2 {
     const DAY: u8 = 3;
     const PART: u8 = 2;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let lines: Vec<Vec<char>> = buf.lines().map(|l| l.unwrap().chars().collect()).collect();
 
         let mut oxygen_lines = lines.clone();

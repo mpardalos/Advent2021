@@ -1,7 +1,4 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use std::io::BufRead;
 
 use crate::Solution;
 
@@ -10,7 +7,7 @@ impl Solution for Part1 {
     const DAY: u8 = 2;
     const PART: u8 = 1;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let mut depth = 0;
         let mut horizontal = 0;
 
@@ -48,7 +45,7 @@ impl Solution for Part2 {
     const DAY: u8 = 2;
     const PART: u8 = 2;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let mut depth = 0;
         let mut horizontal = 0;
         let mut aim = 0;

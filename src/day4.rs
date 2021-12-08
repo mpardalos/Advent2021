@@ -2,8 +2,7 @@ use ansi_term::{Colour, Style};
 use core::fmt;
 use std::{
     fmt::Display,
-    fs::File,
-    io::{BufRead, BufReader},
+    io::BufRead,
 };
 
 use crate::{Extra, Solution};
@@ -45,7 +44,7 @@ fn check_bingo<const N: usize>(board: &[[(bool, i32); N]; N]) -> Option<Bingo> {
     return None;
 }
 
-fn read_input(buf: &mut BufReader<File>) -> (Vec<i32>, Vec<[[(bool, i32); 5]; 5]>) {
+fn read_input(buf: &mut impl BufRead) -> (Vec<i32>, Vec<[[(bool, i32); 5]; 5]>) {
     let mut lines = buf.lines().map(|l| l.unwrap());
 
     let first_line = lines.next().unwrap();
@@ -82,7 +81,7 @@ impl Solution for Part1 {
     const DAY: u8 = 4;
     const PART: u8 = 1;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let (sequence, mut boards) = read_input(buf);
 
         for draw in sequence {
@@ -124,7 +123,7 @@ impl Solution for Part2 {
     const DAY: u8 = 4;
     const PART: u8 = 2;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let (sequence, mut boards) = read_input(buf);
 
         for draw in sequence {
@@ -165,7 +164,7 @@ impl Extra for Visualise {
     const DAY: u8 = 4;
     const USE_SAMPLE: bool = true;
 
-    fn run(buf: &mut BufReader<File>) {
+    fn run(buf: &mut impl BufRead) {
         let normal: Style = Style::new().dimmed();
         let marked: Style = Style::new().fg(Colour::Cyan);
         let just_marked: Style = Style::new().underline().bold().fg(Colour::Red);

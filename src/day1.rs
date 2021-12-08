@@ -1,7 +1,4 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use std::io::BufRead;
 
 use crate::Solution;
 
@@ -9,7 +6,7 @@ pub struct Part1;
 impl Solution for Part1 {
     const DAY: u8 = 1;
     const PART: u8 = 1;
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let mut increases = 0;
         let mut lines = buf.lines().map(|l| l.unwrap());
 
@@ -34,7 +31,7 @@ impl Solution for Part2 {
     const DAY: u8 = 1;
     const PART: u8 = 2;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let mut increases = 0;
         let lines: Vec<i32> = buf.lines().map(|l| l.unwrap().parse().unwrap()).collect();
 

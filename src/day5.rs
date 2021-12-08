@@ -2,8 +2,7 @@ use core::fmt;
 use std::{
     cmp::{max, min},
     fmt::Display,
-    fs::File,
-    io::{BufRead, BufReader},
+    io::BufRead,
 };
 
 use crate::Solution;
@@ -69,7 +68,7 @@ fn count_crossings<const N: usize>(board: &Board<N>) -> usize {
     board.clone().iter().flatten().filter(|x| **x > 1).count()
 }
 
-fn read_input(buf: &mut BufReader<File>) -> Vec<Line> {
+fn read_input(buf: &mut impl BufRead) -> Vec<Line> {
     buf.lines()
         .map(|line| line.unwrap())
         .map(|line| {
@@ -98,7 +97,7 @@ impl<const N: usize> Solution for Part1<N> {
     const DAY: u8 = 5;
     const PART: u8 = 1;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let mut board: Box<Board<N>> = Box::new([[0; N]; N]);
         for line in read_input(buf) {
             if line.is_vertical() {
@@ -130,7 +129,7 @@ impl<const N: usize> Solution for Part2<N> {
     const DAY: u8 = 5;
     const PART: u8 = 1;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let mut board: Box<Board<N>> = Box::new([[0; N]; N]);
         for line in read_input(buf) {
             if line.is_vertical() {

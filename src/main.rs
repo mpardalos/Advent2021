@@ -2,9 +2,9 @@
 
 use clap::Parser;
 use std::{
-    fs::{self, File},
-    io::BufReader,
-    time::{Instant, Duration},
+    fs,
+    io::{BufRead, BufReader},
+    time::{Duration, Instant},
 };
 
 mod day1;
@@ -19,14 +19,14 @@ trait Solution {
     const DAY: u8;
     const PART: u8;
 
-    fn solve(buf: &mut BufReader<File>) -> String;
+    fn solve(buf: &mut impl BufRead) -> String;
 }
 
 trait Extra {
     const DAY: u8;
     const USE_SAMPLE: bool;
 
-    fn run(buf: &mut BufReader<File>);
+    fn run(buf: &mut impl BufRead);
 }
 
 fn format_duration(duration: Duration) -> String {
@@ -84,7 +84,7 @@ fn main() {
 
     match opts.extra {
         None => {
-            let mut clock: Duration = Duration::new(0,0);
+            let mut clock: Duration = Duration::new(0, 0);
 
             clock += solution::<day1::Part1>();
             clock += solution::<day1::Part2>();

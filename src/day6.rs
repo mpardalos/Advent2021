@@ -1,11 +1,8 @@
-use std::{
-    fs,
-    io::{self, BufRead},
-};
+use std::io::BufRead;
 
 use crate::Solution;
 
-fn read_input(buf: &mut io::BufReader<fs::File>) -> Vec<u8> {
+fn read_input(buf: &mut impl BufRead) -> Vec<u8> {
     let line = buf.lines().next().unwrap().unwrap();
     line.split(",")
         .map(str::parse::<u8>)
@@ -58,7 +55,7 @@ impl Solution for Part1 {
     const DAY: u8 = 6;
     const PART: u8 = 1;
 
-    fn solve(buf: &mut io::BufReader<std::fs::File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         fishbuckets(read_input(buf), 80)
     }
 }
@@ -68,7 +65,7 @@ impl Solution for Part2 {
     const DAY: u8 = 6;
     const PART: u8 = 2;
 
-    fn solve(buf: &mut io::BufReader<std::fs::File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         fishbuckets(read_input(buf), 256)
     }
 }

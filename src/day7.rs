@@ -1,11 +1,8 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use std::io::BufRead;
 
 use crate::Solution;
 
-fn read_input(buf: &mut BufReader<File>) -> Vec<i32> {
+fn read_input(buf: &mut impl BufRead) -> Vec<i32> {
     let line = buf.lines().next().unwrap().unwrap();
     line.split(",")
         .map(str::parse)
@@ -18,7 +15,7 @@ impl Solution for Part1 {
     const DAY: u8 = 7;
     const PART: u8 = 1;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let mut nums = read_input(buf);
         nums.sort();
         let median = nums[nums.len() / 2];
@@ -41,7 +38,7 @@ impl Solution for Part2 {
     const DAY: u8 = 7;
     const PART: u8 = 2;
 
-    fn solve(buf: &mut BufReader<File>) -> String {
+    fn solve(buf: &mut impl BufRead) -> String {
         let mut nums = read_input(buf);
         nums.sort();
         let mintarget = (1..*nums.iter().max().unwrap())
