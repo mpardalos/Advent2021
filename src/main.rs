@@ -45,7 +45,7 @@ fn solution_with_file<S: Solution>(filepath: &String) -> Duration {
     let duration = after - before;
 
     println!(
-        "[{}][Day {:>2}][Part {:>2}]: {}",
+        "[{}][Day {:>2}][Part {}]: {}",
         format_duration(duration),
         S::DAY,
         S::PART,
