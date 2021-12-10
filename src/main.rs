@@ -76,14 +76,17 @@ fn extra<E: Extra>() {
 
 #[derive(Parser)]
 struct Opts {
-    #[clap(short, long, about = "Run an 'extra', e.g. a visualisation")]
-    extra: Option<String>,
+    #[clap()]
+    day: Option<i32>,
+
+    #[clap(short, about = "Run an 'extra', e.g. a visualisation")]
+    extra: bool,
 }
 
 fn main() {
     let opts = Opts::parse();
 
-    match opts.extra {
+    match opts.day {
         None => {
             let mut clock: Duration = Duration::new(0, 0);
 
@@ -110,10 +113,52 @@ fn main() {
 
             println!("[{}]", format_duration(clock));
         }
-        Some(e) => match e.as_str() {
-            "vis4" => extra::<day4::Visualise>(),
-            "vis7" => extra::<day7::Visualise>(),
-            _ => eprintln!("Extra does not exist: {}", e),
-        },
-    }
+
+        Some(1) => {
+            solution::<day1::Part1>();
+            solution::<day1::Part2>();
+        }
+
+        Some(2) => {
+            solution::<day2::Part1>();
+            solution::<day2::Part2>();
+        }
+
+        Some(3) => {
+            solution::<day3::Part1>();
+            solution::<day3::Part2>();
+        }
+
+        Some(4) => {
+            if opts.extra {
+                extra::<day4::Visualise>();
+            } else {
+                solution::<day4::Part1>();
+                solution::<day4::Part2>();
+            }
+        }
+
+        Some(5) => {
+            solution::<day5::Part1<1024>>();
+            solution::<day5::Part2<1024>>();
+        }
+
+        Some(6) => {
+            solution::<day6::Part1>();
+            solution::<day6::Part2>();
+        }
+
+        Some(7) => {
+            if opts.extra {
+                extra::<day7::Visualise>();
+            } else {
+                solution::<day7::Part1>();
+                solution::<day7::Part2>();
+            }
+        }
+
+        Some(n) => {
+            eprintln!("I have no solution for day {}", n);
+        }
+    };
 }
