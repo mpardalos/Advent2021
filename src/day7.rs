@@ -127,7 +127,7 @@ impl VisualisationView {
             done: false,
             crab_height: 5.,
             crab_spacing: 1.,
-            step_size: 1
+            step_size: 10
         }
     }
 
