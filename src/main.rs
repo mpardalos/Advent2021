@@ -14,6 +14,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day9;
 mod visualisation;
 
 trait Solution {
@@ -114,6 +115,9 @@ fn main() {
             clock += solution::<day7::Part1>(opts.use_sample);
             clock += solution::<day7::Part2>(opts.use_sample);
 
+            clock += solution::<day9::Part1>(opts.use_sample);
+            clock += solution::<day9::Part2>(opts.use_sample);
+
             println!("[{}]", format_duration(clock));
         }
 
@@ -160,8 +164,17 @@ fn main() {
             }
         }
 
+        Some(9) => {
+            if opts.extra {
+                extra::<day9::Progression>();
+            } else {
+                solution::<day9::Part1>(opts.use_sample);
+                solution::<day9::Part2>(opts.use_sample);
+            }
+        }
+
         Some(n) => {
-            eprintln!("I have no solution for day {}", n);
+            println!("I have no solution for day {}", n);
         }
     };
 }
