@@ -1,8 +1,9 @@
-use std::{io::BufRead, thread::sleep, time::Duration};
+use std::io::BufRead;
 
 use ansi_term::{Colour, Style};
+use sdl2::{pixels::Color, rect::Rect, render::Canvas, video::Window};
 
-use crate::{Extra, Solution};
+use crate::{visualisation::WindowApp, Extra, Solution};
 
 type HeightMap = Vec<Vec<u8>>;
 type Basin = Vec<(usize, usize)>;
@@ -78,7 +79,7 @@ fn map_basin(
     row: usize,
     col: usize,
     basin_locations: &mut Vec<(usize, usize)>,
-    print_cb: &impl Fn(&Basin),
+    print_cb: &mut impl FnMut(&Basin),
 ) {
     if map[row][col] >= 9 {
         return;
@@ -133,18 +134,13 @@ impl Solution for Part2 {
             for (col_idx, _height) in row.iter().enumerate() {
                 if has_basin_at(&map, row_idx, col_idx) {
                     let mut basin = vec![];
-                    map_basin(&map, row_idx, col_idx, &mut basin, &|_| {});
+                    map_basin(&map, row_idx, col_idx, &mut basin, &mut |_| {});
                     basins.push(basin);
                 }
             }
         }
 
         basins.sort_by_key(Vec::len);
-        // basins.iter().rev().for_each(|basin| {
-        //     eprintln!("---");
-        //     print_basin(&map, &basin);
-        //     eprintln!("---");
-        // });
         format!(
             "The top 3 basins' sizes multiplied together give: {}",
             basins.iter().rev().take(3).map(Vec::len).product::<usize>()
@@ -152,26 +148,91 @@ impl Solution for Part2 {
     }
 }
 
-pub struct Progression;
+pub struct Progression {
+    map: HeightMap,
+    basin_views: Vec<Basin>,
+    next_basin_view: usize,
+
+    background_drawn: bool,
+}
+
 impl Extra for Progression {
     const DAY: u8 = 9;
     const USE_SAMPLE: bool = false;
 
     fn run(buf: &mut impl BufRead) {
-        let map = read_input(buf);
+        Self::new(read_input(buf)).run_window();
+    }
+}
+
+impl Progression {
+    fn new(map: HeightMap) -> Self {
+        let mut basin_views: Vec<Basin> = Vec::new();
 
         for (row_idx, row) in map.iter().enumerate() {
             for (col_idx, _height) in row.iter().enumerate() {
                 if has_basin_at(&map, row_idx, col_idx) {
                     let mut basin = vec![];
-                    map_basin(&map, row_idx, col_idx, &mut basin, &|current_basin| {
-                        // Clear the screen
-                        print!("\x1B[2J\n");
-                        print_basin(&map, current_basin);
-                        sleep(Duration::from_millis(1000));
+                    map_basin(&map, row_idx, col_idx, &mut basin, &mut |basin_view| {
+                        basin_views.push(basin_view.clone())
                     });
                 }
             }
         }
+
+        Self {
+            map,
+            basin_views,
+            next_basin_view: 0,
+            background_drawn: false,
+        }
+    }
+}
+
+impl WindowApp for Progression {
+    const WINDOW_NAME: &'static str = "Day 9 - Basins";
+    const WINDOW_WIDTH: u32 = 1100;
+    const WINDOW_HEIGHT: u32 = 1100;
+    const WINDOW_FPS: Option<u32> = Some(1000);
+
+    fn reset(&mut self) {
+        self.background_drawn = false;
+        self.next_basin_view = 0;
+    }
+
+    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String> {
+        if !self.background_drawn {
+            canvas.set_draw_color(Color::RGB(0x11, 0x11, 0x11));
+            canvas.clear();
+
+            canvas.set_draw_color(Color::RGB(0x88, 0x88, 0x88));
+            for (row_idx, row) in self.map.iter().enumerate() {
+                for (col_idx, height) in row.iter().enumerate() {
+                    if *height >= 9 {
+                        canvas.fill_rect(Rect::new(
+                            10 * row_idx as i32,
+                            10 * col_idx as i32,
+                            10,
+                            10,
+                        ))?;
+                    }
+                }
+            }
+
+            self.background_drawn = true;
+        }
+
+        if let Some(basin) = self.basin_views.get(self.next_basin_view) {
+            self.next_basin_view += 1;
+            canvas.set_draw_color(Color::BLUE);
+            canvas.fill_rects(
+                &basin
+                    .iter()
+                    .map(|(row, col)| Rect::new(10 * *row as i32, 10 * *col as i32, 10, 10))
+                    .collect::<Vec<Rect>>()[..],
+            )?;
+            canvas.present();
+        }
+        Ok(())
     }
 }

@@ -1,8 +1,6 @@
 use std::cmp::min;
 use std::io::BufRead;
 
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
@@ -92,17 +90,16 @@ impl Solution for Part2 {
 
 //---- Extra Visualisation --------------------------------
 
-pub struct Visualise;
 impl Extra for Visualise {
     const DAY: u8 = 7;
     const USE_SAMPLE: bool = false;
 
     fn run(buf: &mut impl BufRead) {
-        VisualisationView::new(read_input(buf)).run();
+        Visualise::new(read_input(buf)).run_window();
     }
 }
 
-struct VisualisationView {
+pub struct Visualise {
     positions: Vec<i32>,
     start_positions: Vec<i32>,
     target_position: i32,
@@ -113,7 +110,7 @@ struct VisualisationView {
     step_size: i32,
 }
 
-impl VisualisationView {
+impl Visualise {
     fn new(positions: Vec<i32>) -> Self {
         Self {
             target_position: Part1::align_spot(&positions),
@@ -127,22 +124,14 @@ impl VisualisationView {
     }
 }
 
-impl WindowApp for VisualisationView {
+impl WindowApp for Visualise {
     const WINDOW_NAME: &'static str = "Day 7 - Crabs";
     const WINDOW_WIDTH: u32 = 1200;
     const WINDOW_HEIGHT: u32 = 800;
-    const WINDOW_FPS: u32 = 60;
+    const WINDOW_FPS: Option<u32> = Some(60);
 
-    fn handle_event(&mut self, event: Event) {
-        if let Event::KeyUp {
-            keycode: Some(key), ..
-        } = event
-        {
-            match key {
-                Keycode::R => self.positions = self.start_positions.clone(),
-                _ => {}
-            }
-        }
+    fn reset(&mut self) {
+        self.positions = self.start_positions.clone();
     }
 
     fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String> {

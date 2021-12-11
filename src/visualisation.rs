@@ -9,12 +9,13 @@ pub trait WindowApp {
     const WINDOW_NAME: &'static str;
     const WINDOW_WIDTH: u32;
     const WINDOW_HEIGHT: u32;
-    const WINDOW_FPS: u32;
+    const WINDOW_FPS: Option<u32>;
 
     fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String>;
-    fn handle_event(&mut self, event: Event);
+    fn handle_event(&mut self, _event: Event) {}
+    fn reset(&mut self) {}
 
-    fn run(&mut self) {
+    fn run_window(&mut self) {
         let sdl_context = sdl2::init().unwrap();
         let video_subsystem = sdl_context.video().unwrap();
 
@@ -39,13 +40,19 @@ pub trait WindowApp {
                         keycode: Some(Keycode::Escape | Keycode::Q),
                         ..
                     } => break 'running,
+                    Event::KeyDown {
+                        keycode: Some(Keycode::R),
+                        ..
+                    } => self.reset(),
                     _ => self.handle_event(event),
                 }
             }
 
             self.draw_frame(&mut canvas).unwrap();
 
-            std::thread::sleep(Duration::new(0, 1_000_000_000u32 / Self::WINDOW_FPS));
+            if let Some(fps) = Self::WINDOW_FPS {
+                std::thread::sleep(Duration::new(0, 1_000_000_000u32 / fps));
+            }
         }
     }
 }
