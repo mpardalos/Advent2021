@@ -1,10 +1,14 @@
 use std::cmp::min;
 use std::io::BufRead;
 
-use minifb::{Key, KeyRepeat, Window};
-use raqote::{DrawOptions, DrawTarget, PathBuilder, SolidSource, Source};
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
+use sdl2::pixels::Color;
+use sdl2::rect::Rect;
+use sdl2::render::Canvas;
+use sdl2::video::Window;
 
-use crate::visualisation::run_window;
+use crate::visualisation::WindowApp;
 use crate::{Extra, Solution};
 
 fn read_input(buf: &mut impl BufRead) -> Vec<i32> {
@@ -94,10 +98,7 @@ impl Extra for Visualise {
     const USE_SAMPLE: bool = false;
 
     fn run(buf: &mut impl BufRead) {
-        let mut visualisation = VisualisationView::new(read_input(buf));
-        run_window("Day 7", 800, 800, &mut |window, dt| {
-            visualisation.update(window, dt)
-        });
+        VisualisationView::new(read_input(buf)).run();
     }
 }
 
@@ -109,17 +110,11 @@ struct VisualisationView {
 
     crab_height: f32,
     crab_spacing: f32,
-    step_size: i32
+    step_size: i32,
 }
 
 impl VisualisationView {
     fn new(positions: Vec<i32>) -> Self {
-        // let font = SystemSource::new()
-        //     .select_best_match(&[FamilyName::SansSerif], &Properties::new())
-        //     .unwrap()
-        //     .load()
-        //     .unwrap();
-
         Self {
             target_position: Part1::align_spot(&positions),
             start_positions: positions.clone(),
@@ -127,38 +122,45 @@ impl VisualisationView {
             done: false,
             crab_height: 5.,
             crab_spacing: 1.,
-            step_size: 10
+            step_size: 10,
+        }
+    }
+}
+
+impl WindowApp for VisualisationView {
+    const WINDOW_NAME: &'static str = "Day 7 - Crabs";
+    const WINDOW_WIDTH: u32 = 1200;
+    const WINDOW_HEIGHT: u32 = 800;
+    const WINDOW_FPS: u32 = 60;
+
+    fn handle_event(&mut self, event: Event) {
+        if let Event::KeyUp {
+            keycode: Some(key), ..
+        } = event
+        {
+            match key {
+                Keycode::R => self.positions = self.start_positions.clone(),
+                _ => {}
+            }
         }
     }
 
-    fn update(&mut self, window: &Window, dt: &mut DrawTarget) -> bool {
+    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String> {
         if self.done {
-            return false;
+            return Ok(());
         }
 
-        window.get_keys_pressed(KeyRepeat::No).map(|keys| {
-            for t in keys {
-                match t {
-                    Key::R => self.positions = self.start_positions.clone(),
-                    _ => (),
-                }
-            }
-        });
+        canvas.set_draw_color(Color::RGB(0, 0, 0));
+        canvas.clear();
 
-        dt.clear(SolidSource::from_unpremultiplied_argb(0, 0, 0, 0));
         // Draw the crabs
-        let mut y = 10.;
-        let mut pb = PathBuilder::new();
+        let mut y = 10;
+
         for crab_x in &self.positions {
-            pb.rect(*crab_x as f32, y, 10., 10.);
-            y += 15.;
+            y += 15;
+            canvas.set_draw_color(Color::RED);
+            canvas.fill_rect(Rect::new(*crab_x as i32, y as i32, 10 as u32, 10 as u32))?
         }
-        let path = pb.finish();
-        dt.fill(
-            &path,
-            &Source::Solid(SolidSource::from_unpremultiplied_argb(0xff, 0xff, 0, 0)),
-            &DrawOptions::new(),
-        );
 
         for crab_x in self.positions.iter_mut() {
             if *crab_x != self.target_position {
@@ -170,6 +172,8 @@ impl VisualisationView {
             }
         }
 
-        true
+        canvas.present();
+
+        Ok(())
     }
 }

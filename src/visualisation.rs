@@ -1,35 +1,51 @@
-use minifb::{Window, WindowOptions};
-use raqote::DrawTarget;
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
+use sdl2::pixels::Color;
+use sdl2::render::Canvas;
+use sdl2::video::Window;
+use std::time::Duration;
 
-pub fn run_window<F: FnMut(&Window, &mut DrawTarget) -> bool>(
-    name: &str,
-    width: usize,
-    height: usize,
-    draw: &mut F,
-) {
-    let mut window: Window = Window::new(
-        name,
-        width,
-        height,
-        WindowOptions {
-            resize: true,
-            ..WindowOptions::default()
-        },
-    )
-    .unwrap();
+pub trait WindowApp {
+    const WINDOW_NAME: &'static str;
+    const WINDOW_WIDTH: u32;
+    const WINDOW_HEIGHT: u32;
+    const WINDOW_FPS: u32;
 
-    let mut size = window.get_size();
-    let mut dt = DrawTarget::new(size.0 as i32, size.1 as i32);
-    while window.is_open() {
-        if window.get_size() != size {
-            size = window.get_size();
-            dt = DrawTarget::new(size.0 as i32, size.1 as i32);
-        }
+    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String>;
+    fn handle_event(&mut self, event: Event);
 
-        if draw(&window, &mut dt) {
-            window
-                .update_with_buffer(dt.get_data(), size.0, size.1)
-                .unwrap();
+    fn run(&mut self) {
+        let sdl_context = sdl2::init().unwrap();
+        let video_subsystem = sdl_context.video().unwrap();
+
+        let window = video_subsystem
+            .window(Self::WINDOW_NAME, Self::WINDOW_WIDTH, Self::WINDOW_HEIGHT)
+            .position_centered()
+            .build()
+            .unwrap();
+
+        let mut canvas: Canvas<Window> = window.into_canvas().build().unwrap();
+
+        canvas.set_draw_color(Color::RGB(0, 0, 0));
+        canvas.clear();
+        canvas.present();
+
+        let mut event_pump = sdl_context.event_pump().unwrap();
+        'running: loop {
+            for event in event_pump.poll_iter() {
+                match event {
+                    Event::Quit { .. }
+                    | Event::KeyDown {
+                        keycode: Some(Keycode::Escape | Keycode::Q),
+                        ..
+                    } => break 'running,
+                    _ => self.handle_event(event),
+                }
+            }
+
+            self.draw_frame(&mut canvas).unwrap();
+
+            std::thread::sleep(Duration::new(0, 1_000_000_000u32 / Self::WINDOW_FPS));
         }
     }
 }
