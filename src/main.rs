@@ -191,7 +191,7 @@ fn main() {
 
         Some(11) => {
             if opts.extra {
-                extra::<day11::Blinkenlights>();
+                extra::<day11::Octoblink>();
             } else {
                 solution::<day11::Part1>(opts.use_sample);
                 solution::<day11::Part2>(opts.use_sample);

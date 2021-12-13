@@ -135,13 +135,13 @@ impl Solution for Part2 {
     }
 }
 
-pub struct Blinkenlights {
+pub struct Octoblink {
     initial_grid: Grid,
     grid: Grid,
     background_drawn: bool,
 }
 
-impl Extra for Blinkenlights {
+impl Extra for Octoblink {
     const DAY: u8 = 11;
     const USE_SAMPLE: bool = false;
 
@@ -150,7 +150,7 @@ impl Extra for Blinkenlights {
     }
 }
 
-impl Blinkenlights {
+impl Octoblink {
     fn new(grid: Grid) -> Self {
         Self {
             initial_grid: grid.clone(),
@@ -160,11 +160,11 @@ impl Blinkenlights {
     }
 }
 
-impl WindowApp for Blinkenlights {
-    const WINDOW_NAME: &'static str = "Day 11 - Blinkenlights";
+impl WindowApp for Octoblink {
+    const WINDOW_NAME: &'static str = "Day 11 - Octoblink";
     const WINDOW_WIDTH: u32 = 800;
     const WINDOW_HEIGHT: u32 = 800;
-    const WINDOW_FPS: Option<u32> = Some(30);
+    const WINDOW_FPS: Option<u32> = Some(10);
 
     fn reset(&mut self) {
         self.grid = self.initial_grid.clone();
