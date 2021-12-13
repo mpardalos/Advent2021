@@ -60,9 +60,13 @@ fn solution_with_file<S: Solution>(filepath: &String) -> Duration {
     duration
 }
 
-fn solution<S: Solution>(use_sample: bool) -> Duration {
-    if use_sample {
-        solution_with_file::<S>(&format!("inputs/{}_sample", S::DAY))
+fn solution<S: Solution>(use_sample: &Option<String>) -> Duration {
+    if let Some(sample) = use_sample {
+        if sample.is_empty() {
+            solution_with_file::<S>(&format!("inputs/{}_sample", S::DAY))
+        } else {
+            solution_with_file::<S>(&format!("inputs/{}_sample_{}", S::DAY, sample))
+        }
     } else {
         solution_with_file::<S>(&format!("inputs/{}", S::DAY))
     }
@@ -88,8 +92,8 @@ struct Opts {
     #[clap(short, about = "Run an 'extra', e.g. a visualisation")]
     extra: bool,
 
-    #[clap(short = 's', about = "Run an 'extra', e.g. a visualisation")]
-    use_sample: bool,
+    #[clap(short = 's', about = "Use a sample input")]
+    sample_input: Option<String>,
 }
 
 fn main() {
@@ -99,79 +103,79 @@ fn main() {
         None => {
             let mut clock: Duration = Duration::new(0, 0);
 
-            clock += solution::<day1::Part1>(opts.use_sample);
-            clock += solution::<day1::Part2>(opts.use_sample);
+            clock += solution::<day1::Part1>(&opts.sample_input);
+            clock += solution::<day1::Part2>(&opts.sample_input);
 
-            clock += solution::<day2::Part1>(opts.use_sample);
-            clock += solution::<day2::Part2>(opts.use_sample);
+            clock += solution::<day2::Part1>(&opts.sample_input);
+            clock += solution::<day2::Part2>(&opts.sample_input);
 
-            clock += solution::<day3::Part1>(opts.use_sample);
-            clock += solution::<day3::Part2>(opts.use_sample);
+            clock += solution::<day3::Part1>(&opts.sample_input);
+            clock += solution::<day3::Part2>(&opts.sample_input);
 
-            clock += solution::<day4::Part1>(opts.use_sample);
-            clock += solution::<day4::Part2>(opts.use_sample);
+            clock += solution::<day4::Part1>(&opts.sample_input);
+            clock += solution::<day4::Part2>(&opts.sample_input);
 
-            clock += solution::<day5::Part1<1024>>(opts.use_sample);
-            clock += solution::<day5::Part2<1024>>(opts.use_sample);
+            clock += solution::<day5::Part1<1024>>(&opts.sample_input);
+            clock += solution::<day5::Part2<1024>>(&opts.sample_input);
 
-            clock += solution::<day6::Part1>(opts.use_sample);
-            clock += solution::<day6::Part2>(opts.use_sample);
+            clock += solution::<day6::Part1>(&opts.sample_input);
+            clock += solution::<day6::Part2>(&opts.sample_input);
 
-            clock += solution::<day7::Part1>(opts.use_sample);
-            clock += solution::<day7::Part2>(opts.use_sample);
+            clock += solution::<day7::Part1>(&opts.sample_input);
+            clock += solution::<day7::Part2>(&opts.sample_input);
 
-            clock += solution::<day9::Part1>(opts.use_sample);
-            clock += solution::<day9::Part2>(opts.use_sample);
+            clock += solution::<day9::Part1>(&opts.sample_input);
+            clock += solution::<day9::Part2>(&opts.sample_input);
 
-            clock += solution::<day10::Part1>(opts.use_sample);
-            clock += solution::<day10::Part2>(opts.use_sample);
+            clock += solution::<day10::Part1>(&opts.sample_input);
+            clock += solution::<day10::Part2>(&opts.sample_input);
 
-            clock += solution::<day11::Part1>(opts.use_sample);
-            clock += solution::<day11::Part2>(opts.use_sample);
+            clock += solution::<day11::Part1>(&opts.sample_input);
+            clock += solution::<day11::Part2>(&opts.sample_input);
 
             println!("[{}]", format_duration(clock));
         }
 
         Some(1) => {
-            solution::<day1::Part1>(opts.use_sample);
-            solution::<day1::Part2>(opts.use_sample);
+            solution::<day1::Part1>(&opts.sample_input);
+            solution::<day1::Part2>(&opts.sample_input);
         }
 
         Some(2) => {
-            solution::<day2::Part1>(opts.use_sample);
-            solution::<day2::Part2>(opts.use_sample);
+            solution::<day2::Part1>(&opts.sample_input);
+            solution::<day2::Part2>(&opts.sample_input);
         }
 
         Some(3) => {
-            solution::<day3::Part1>(opts.use_sample);
-            solution::<day3::Part2>(opts.use_sample);
+            solution::<day3::Part1>(&opts.sample_input);
+            solution::<day3::Part2>(&opts.sample_input);
         }
 
         Some(4) => {
             if opts.extra {
                 extra::<day4::Visualise>();
             } else {
-                solution::<day4::Part1>(opts.use_sample);
-                solution::<day4::Part2>(opts.use_sample);
+                solution::<day4::Part1>(&opts.sample_input);
+                solution::<day4::Part2>(&opts.sample_input);
             }
         }
 
         Some(5) => {
-            solution::<day5::Part1<1024>>(opts.use_sample);
-            solution::<day5::Part2<1024>>(opts.use_sample);
+            solution::<day5::Part1<1024>>(&opts.sample_input);
+            solution::<day5::Part2<1024>>(&opts.sample_input);
         }
 
         Some(6) => {
-            solution::<day6::Part1>(opts.use_sample);
-            solution::<day6::Part2>(opts.use_sample);
+            solution::<day6::Part1>(&opts.sample_input);
+            solution::<day6::Part2>(&opts.sample_input);
         }
 
         Some(7) => {
             if opts.extra {
                 extra::<day7::Visualise>();
             } else {
-                solution::<day7::Part1>(opts.use_sample);
-                solution::<day7::Part2>(opts.use_sample);
+                solution::<day7::Part1>(&opts.sample_input);
+                solution::<day7::Part2>(&opts.sample_input);
             }
         }
 
@@ -179,22 +183,22 @@ fn main() {
             if opts.extra {
                 extra::<day9::Progression>();
             } else {
-                solution::<day9::Part1>(opts.use_sample);
-                solution::<day9::Part2>(opts.use_sample);
+                solution::<day9::Part1>(&opts.sample_input);
+                solution::<day9::Part2>(&opts.sample_input);
             }
         }
 
         Some(10) => {
-            solution::<day10::Part1>(opts.use_sample);
-            solution::<day10::Part2>(opts.use_sample);
+            solution::<day10::Part1>(&opts.sample_input);
+            solution::<day10::Part2>(&opts.sample_input);
         }
 
         Some(11) => {
             if opts.extra {
                 extra::<day11::Octoblink>();
             } else {
-                solution::<day11::Part1>(opts.use_sample);
-                solution::<day11::Part2>(opts.use_sample);
+                solution::<day11::Part1>(&opts.sample_input);
+                solution::<day11::Part2>(&opts.sample_input);
             }
         }
 
