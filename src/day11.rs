@@ -200,8 +200,6 @@ impl WindowApp for Blinkenlights {
             }
         }
 
-        canvas.present();
-
         Ok(())
     }
 }

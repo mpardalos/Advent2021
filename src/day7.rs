@@ -161,8 +161,6 @@ impl WindowApp for Visualise {
             }
         }
 
-        canvas.present();
-
         Ok(())
     }
 }

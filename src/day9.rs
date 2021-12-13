@@ -3,7 +3,7 @@ use std::io::BufRead;
 use ansi_term::{Colour, Style};
 use sdl2::{pixels::Color, rect::Rect, render::Canvas, video::Window};
 
-use crate::{visualisation::WindowApp, Extra, Solution, util::neighbours};
+use crate::{util::neighbours, visualisation::WindowApp, Extra, Solution};
 
 type HeightMap = Vec<Vec<u8>>;
 type Basin = Vec<(usize, usize)>;
@@ -165,7 +165,7 @@ impl WindowApp for Progression {
     const WINDOW_NAME: &'static str = "Day 9 - Basins";
     const WINDOW_WIDTH: u32 = 1100;
     const WINDOW_HEIGHT: u32 = 1100;
-    const WINDOW_FPS: Option<u32> = Some(1000);
+    const WINDOW_FPS: Option<u32> = Some(60);
 
     fn reset(&mut self) {
         self.background_drawn = false;
@@ -173,17 +173,19 @@ impl WindowApp for Progression {
     }
 
     fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String> {
-        if !self.background_drawn {
-            canvas.set_draw_color(Color::RGB(0x11, 0x11, 0x11));
-            canvas.clear();
+        canvas.set_draw_color(Color::RGB(0x11, 0x11, 0x11));
+        canvas.clear();
+
+        if let Some(basin) = self.basin_views.get(self.next_basin_view) {
+            self.next_basin_view = (self.next_basin_view + 1) % self.basin_views.len();
 
             canvas.set_draw_color(Color::RGB(0x88, 0x88, 0x88));
             for (row_idx, row) in self.map.iter().enumerate() {
                 for (col_idx, height) in row.iter().enumerate() {
                     if *height >= 9 {
                         canvas.fill_rect(Rect::new(
-                            10 * row_idx as i32,
                             10 * col_idx as i32,
+                            10 * row_idx as i32,
                             10,
                             10,
                         ))?;
@@ -191,19 +193,13 @@ impl WindowApp for Progression {
                 }
             }
 
-            self.background_drawn = true;
-        }
-
-        if let Some(basin) = self.basin_views.get(self.next_basin_view) {
-            self.next_basin_view += 1;
             canvas.set_draw_color(Color::BLUE);
             canvas.fill_rects(
                 &basin
                     .iter()
-                    .map(|(row, col)| Rect::new(10 * *row as i32, 10 * *col as i32, 10, 10))
+                    .map(|(row, col)| Rect::new(10 * *col as i32, 10 * *row as i32, 10, 10))
                     .collect::<Vec<Rect>>()[..],
             )?;
-            canvas.present();
         }
         Ok(())
     }
