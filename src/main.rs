@@ -17,6 +17,9 @@ mod day7;
 mod day9;
 
 mod day10;
+mod day11;
+
+mod util;
 mod visualisation;
 
 trait Solution {
@@ -123,6 +126,9 @@ fn main() {
             clock += solution::<day10::Part1>(opts.use_sample);
             clock += solution::<day10::Part2>(opts.use_sample);
 
+            clock += solution::<day11::Part1>(opts.use_sample);
+            clock += solution::<day11::Part2>(opts.use_sample);
+
             println!("[{}]", format_duration(clock));
         }
 
@@ -181,6 +187,15 @@ fn main() {
         Some(10) => {
             solution::<day10::Part1>(opts.use_sample);
             solution::<day10::Part2>(opts.use_sample);
+        }
+
+        Some(11) => {
+            if opts.extra {
+                extra::<day11::Blinkenlights>();
+            } else {
+                solution::<day11::Part1>(opts.use_sample);
+                solution::<day11::Part2>(opts.use_sample);
+            }
         }
 
         Some(n) => {

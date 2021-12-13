@@ -31,6 +31,7 @@ pub trait WindowApp {
         canvas.clear();
         canvas.present();
 
+        let mut target_fps = Self::WINDOW_FPS;
         let mut event_pump = sdl_context.event_pump().unwrap();
         'running: loop {
             for event in event_pump.poll_iter() {
@@ -44,13 +45,25 @@ pub trait WindowApp {
                         keycode: Some(Keycode::R),
                         ..
                     } => self.reset(),
+                    Event::KeyDown {
+                        keycode: Some(Keycode::O),
+                        ..
+                    } => {
+                        target_fps = target_fps
+                            .map(|f| if f > 1 { f - 1 } else { f })
+                            .or(Some(60))
+                    }
+                    Event::KeyDown {
+                        keycode: Some(Keycode::P),
+                        ..
+                    } => target_fps = target_fps.map(|f| f.saturating_add(1)).or(Some(60)),
                     _ => self.handle_event(event),
                 }
             }
 
             self.draw_frame(&mut canvas).unwrap();
 
-            if let Some(fps) = Self::WINDOW_FPS {
+            if let Some(fps) = target_fps {
                 std::thread::sleep(Duration::new(0, 1_000_000_000u32 / fps));
             }
         }

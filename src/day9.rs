@@ -3,7 +3,7 @@ use std::io::BufRead;
 use ansi_term::{Colour, Style};
 use sdl2::{pixels::Color, rect::Rect, render::Canvas, video::Window};
 
-use crate::{visualisation::WindowApp, Extra, Solution};
+use crate::{visualisation::WindowApp, Extra, Solution, util::neighbours};
 
 type HeightMap = Vec<Vec<u8>>;
 type Basin = Vec<(usize, usize)>;
@@ -17,34 +17,6 @@ fn read_input(buf: &mut impl BufRead) -> HeightMap {
                 .collect()
         })
         .collect()
-}
-
-fn neighbours<'a>(
-    map: &'a HeightMap,
-    row: usize,
-    col: usize,
-) -> impl Iterator<Item = ((usize, usize), &'a u8)> + 'a {
-    if let Some(_) = map.get(row).and_then(|r| r.get(col)) {
-        let north = if row > 0 { Some((row - 1, col)) } else { None };
-        let west = if col > 0 { Some((row, col - 1)) } else { None };
-        let south = if row < map.len() - 1 {
-            Some((row + 1, col))
-        } else {
-            None
-        };
-        let east = if col < map[0].len() - 1 {
-            Some((row, col + 1))
-        } else {
-            None
-        };
-
-        vec![north, west, south, east]
-    } else {
-        vec![]
-    }
-    .into_iter()
-    .flatten()
-    .map(|(nrow, ncol)| ((nrow, ncol), &map[nrow][ncol]))
 }
 
 fn has_basin_at(map: &HeightMap, row: usize, col: usize) -> bool {
