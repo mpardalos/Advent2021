@@ -19,6 +19,7 @@ mod day9;
 mod day10;
 mod day11;
 mod day12;
+mod day13;
 
 mod util;
 mod visualisation;
@@ -137,6 +138,9 @@ fn main() {
             clock += solution::<day12::Part1>(&opts.sample_input);
             clock += solution::<day12::Part2>(&opts.sample_input);
 
+            clock += solution::<day13::Part1>(&opts.sample_input);
+            clock += solution::<day13::Part2>(&opts.sample_input);
+
             println!("[{}]", format_duration(clock));
         }
 
@@ -209,6 +213,11 @@ fn main() {
         Some(12) => {
             solution::<day12::Part1>(&opts.sample_input);
             solution::<day12::Part2>(&opts.sample_input);
+        }
+
+        Some(13) => {
+            solution::<day13::Part1>(&opts.sample_input);
+            solution::<day13::Part2>(&opts.sample_input);
         }
 
         Some(n) => {
