@@ -163,8 +163,8 @@ impl Progression {
 
 impl WindowApp for Progression {
     const WINDOW_NAME: &'static str = "Day 9 - Basins";
-    const WINDOW_WIDTH: u32 = 1100;
-    const WINDOW_HEIGHT: u32 = 1100;
+    const WINDOW_WIDTH: u32 = 1000;
+    const WINDOW_HEIGHT: u32 = 1000;
     const WINDOW_FPS: Option<u32> = Some(60);
 
     fn reset(&mut self) {
@@ -172,12 +172,10 @@ impl WindowApp for Progression {
         self.next_basin_view = 0;
     }
 
-    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String> {
-        canvas.set_draw_color(Color::RGB(0x11, 0x11, 0x11));
-        canvas.clear();
-
-        if let Some(basin) = self.basin_views.get(self.next_basin_view) {
-            self.next_basin_view = (self.next_basin_view + 1) % self.basin_views.len();
+    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<bool, String> {
+        if !self.background_drawn {
+            canvas.set_draw_color(Color::RGB(0x11, 0x11, 0x11));
+            canvas.clear();
 
             canvas.set_draw_color(Color::RGB(0x88, 0x88, 0x88));
             for (row_idx, row) in self.map.iter().enumerate() {
@@ -193,6 +191,11 @@ impl WindowApp for Progression {
                 }
             }
 
+            self.background_drawn = true;
+        }
+
+        if let Some(basin) = self.basin_views.get(self.next_basin_view) {
+            self.next_basin_view += 1;
             canvas.set_draw_color(Color::BLUE);
             canvas.fill_rects(
                 &basin
@@ -200,7 +203,9 @@ impl WindowApp for Progression {
                     .map(|(row, col)| Rect::new(10 * *col as i32, 10 * *row as i32, 10, 10))
                     .collect::<Vec<Rect>>()[..],
             )?;
+            Ok(true)
+        } else {
+            Ok(false)
         }
-        Ok(())
     }
 }

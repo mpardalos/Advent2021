@@ -1,9 +1,6 @@
 use ansi_term::{Colour, Style};
 use core::fmt;
-use std::{
-    fmt::Display,
-    io::BufRead,
-};
+use std::{fmt::Display, io::BufRead};
 
 use crate::{Extra, Solution};
 

@@ -170,7 +170,7 @@ impl WindowApp for Octoblink {
         self.grid = self.initial_grid.clone();
     }
 
-    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String> {
+    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<bool, String> {
         let size: u32 = 80;
 
         canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
@@ -186,7 +186,11 @@ impl WindowApp for Octoblink {
                     0xFF,
                     0x00,
                     0xFF,
-                    if *energy == 0 { 0xFF } else { 6 * (*energy as u8) },
+                    if *energy == 0 {
+                        0xFF
+                    } else {
+                        6 * (*energy as u8)
+                    },
                 );
                 canvas.set_draw_color(color);
                 let rect = Rect::new(
@@ -200,6 +204,6 @@ impl WindowApp for Octoblink {
             }
         }
 
-        Ok(())
+        Ok(true)
     }
 }

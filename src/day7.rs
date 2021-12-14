@@ -134,9 +134,9 @@ impl WindowApp for Visualise {
         self.positions = self.start_positions.clone();
     }
 
-    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String> {
+    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<bool, String> {
         if self.done {
-            return Ok(());
+            return Ok(true);
         }
 
         canvas.set_draw_color(Color::RGB(0, 0, 0));
@@ -161,6 +161,6 @@ impl WindowApp for Visualise {
             }
         }
 
-        Ok(())
+        Ok(true)
     }
 }

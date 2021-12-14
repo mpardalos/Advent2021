@@ -7,24 +7,32 @@ use sdl2::video::Window;
 use sdl2::{event::Event, render::WindowCanvas};
 use std::time::{Duration, Instant};
 
+pub enum TextBackground {
+    Solid(Color),
+    Transparent,
+}
+
 pub fn show_text(
     canvas: &mut WindowCanvas,
     font: &Font,
+    background: TextBackground,
     x: i32,
     y: i32,
     text: &str,
-) -> Result<(), String> {
+) -> Result<Rect, String> {
     let texture_creator = canvas.texture_creator();
-    let surface = font
-        .render(text)
-        .blended(Color::WHITE)
-        .map_err(|e| e.to_string())?;
+    let surface = match background {
+        TextBackground::Solid(bg) => font.render(text).shaded(Color::WHITE, bg),
+        TextBackground::Transparent => font.render(text).blended(Color::WHITE),
+    }
+    .map_err(|e| e.to_string())?;
     let texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
     let TextureQuery { width, height, .. } = texture.query();
-    canvas.copy(&texture, None, Some(Rect::new(x, y, width, height)))?;
-    Ok(())
+    let target_rect = Rect::new(x, y, width, height);
+    canvas.copy(&texture, None, Some(target_rect))?;
+    Ok(target_rect)
 }
 
 pub trait WindowApp {
@@ -34,7 +42,7 @@ pub trait WindowApp {
     const WINDOW_FPS: Option<u32>;
     const SHOW_FPS: bool = true;
 
-    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<(), String>;
+    fn draw_frame(&mut self, canvas: &mut Canvas<Window>) -> Result<bool, String>;
     fn handle_event(&mut self, _event: Event) {}
     fn reset(&mut self) {}
 
@@ -50,7 +58,9 @@ pub trait WindowApp {
         let mut canvas: Canvas<Window> = window.into_canvas().build().unwrap();
 
         // Load a font
-        let mut font = ttf_context.load_font("/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf", 18).unwrap();
+        let mut font = ttf_context
+            .load_font("/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf", 18)
+            .unwrap();
         font.set_style(sdl2::ttf::FontStyle::BOLD);
 
         let mut target_fps = Self::WINDOW_FPS;
@@ -85,24 +95,25 @@ pub trait WindowApp {
                 }
             }
 
-            self.draw_frame(&mut canvas).unwrap();
+            if self.draw_frame(&mut canvas).unwrap() {
+                if let Some(fps) = target_fps {
+                    std::thread::sleep(Duration::new(0, 1_000_000_000u32 / fps));
+                }
 
-            if let Some(fps) = target_fps {
-                std::thread::sleep(Duration::new(0, 1_000_000_000u32 / fps));
+                let now = Instant::now();
+                let frametime = now - frame_time_counter;
+                frame_time_counter = now;
+                show_text(
+                    &mut canvas,
+                    &font,
+                    TextBackground::Solid(Color::BLACK),
+                    0,
+                    0,
+                    &format!("{:.0}", 1. / frametime.as_secs_f32()),
+                )
+                .unwrap();
+                canvas.present();
             }
-
-            let now = Instant::now();
-            let frametime = now - frame_time_counter;
-            frame_time_counter = now;
-            show_text(
-                &mut canvas,
-                &font,
-                0,
-                0,
-                &format!("{:.0}", 1. / frametime.as_secs_f32()),
-            )
-            .unwrap();
-            canvas.present();
         }
     }
 }
