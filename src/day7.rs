@@ -1,8 +1,9 @@
 use std::cmp::min;
+use std::collections::HashMap;
 use std::io::BufRead;
 
 use sdl2::pixels::Color;
-use sdl2::rect::Rect;
+use sdl2::rect::{Point, Rect};
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 
@@ -119,7 +120,7 @@ impl Visualise {
             done: false,
             crab_height: 5.,
             crab_spacing: 1.,
-            step_size: 10,
+            step_size: 1,
         }
     }
 }
@@ -127,8 +128,8 @@ impl Visualise {
 impl WindowApp for Visualise {
     const WINDOW_NAME: &'static str = "Day 7 - Crabs";
     const WINDOW_WIDTH: u32 = 1200;
-    const WINDOW_HEIGHT: u32 = 800;
-    const WINDOW_FPS: Option<u32> = Some(60);
+    const WINDOW_HEIGHT: u32 = 1000;
+    const WINDOW_FPS: Option<u32> = Some(165);
 
     fn reset(&mut self) {
         self.positions = self.start_positions.clone();
@@ -143,13 +144,26 @@ impl WindowApp for Visualise {
         canvas.clear();
 
         // Draw the crabs
-        let mut y = 10;
+        let mut y = 0;
 
+        let mut counter: HashMap<i32, i32> = HashMap::new();
         for crab_x in &self.positions {
-            y += 15;
+            *counter.entry(*crab_x).or_insert(0) += 1;
+            y += 1;
             canvas.set_draw_color(Color::RED);
-            canvas.fill_rect(Rect::new(*crab_x as i32, y as i32, 10 as u32, 10 as u32))?
+            canvas.fill_rect(Rect::new(*crab_x, y, 8, 1))?
         }
+
+        canvas.set_draw_color(Color::WHITE);
+        let points = (0..Self::WINDOW_WIDTH)
+            .map(|x| {
+                Point::new(
+                    x as i32,
+                    Self::WINDOW_HEIGHT as i32 - 20 * *counter.get(&(x as i32)).unwrap_or(&0),
+                )
+            })
+            .collect::<Vec<Point>>();
+        canvas.draw_lines(&points[..])?;
 
         for crab_x in self.positions.iter_mut() {
             if *crab_x != self.target_position {
